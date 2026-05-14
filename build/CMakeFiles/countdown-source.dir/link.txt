@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,--dependency-file=CMakeFiles/countdown-source.dir/link.d  -o countdown-source.so "CMakeFiles/countdown-source.dir/src/plugin.cpp.o"  /usr/lib/libobs.so.30
