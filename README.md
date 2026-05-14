@@ -70,13 +70,18 @@ Alternatively, pass the directory directly to CMake with
 `-DMINGW_BINDIR=/opt/mingw64/bin`, or pass the compiler explicitly with
 `-DCMAKE_CXX_COMPILER=/opt/mingw64/bin/x86_64-w64-mingw32-g++`.
 
-Then configure and build:
+Then configure and build. Start from a clean Windows build directory whenever
+you change generators, toolchains, or cached OBS paths:
 
 ```sh
+rm -rf build-win
+
 cmake -S . -B build-win \
+  -G Ninja \
   -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/windows-mingw.cmake \
-  -DLIBOBS_INCLUDE_DIR=/path/to/windows-obs/libobs \
-  -DLIBOBS_LIBRARY=/path/to/windows-obs/libobs.dll.a
+  -DLIBOBS_INCLUDE_DIR="$HOME/vendor/obs-src/libobs" \
+  -DLIBOBS_LIBRARY="$HOME/vendor/obs-mingw-lib/libobs.dll.a" \
+  -DLIBOBS_DLL="$OBS_DLL"
 cmake --build build-win
 ```
 
@@ -89,3 +94,23 @@ and import library on the imported target.
 If your Windows OBS build provides a MinGW-compatible `libobsConfig.cmake`, you
 can point `OBS_DIR` or `libobs_DIR` at that package instead of passing explicit
 `LIBOBS_*` paths.
+
+## Troubleshooting
+
+### `Ninja does not match the generator used previously`
+
+CMake stores the generator in the build directory cache. If `build-win` was
+first configured with Unix Makefiles, you cannot reuse that same directory with
+`-G Ninja`. Delete it and configure again, or use a different build directory:
+
+```sh
+rm -rf build-win
+# or pick a fresh directory, such as: cmake -S . -B build-win-ninja -G Ninja ...
+```
+
+### `target pattern contains no '%'` after a failed configure
+
+Do not keep building a directory after CMake reports a configure error. Clean the
+build directory and configure again. Also avoid quoting `~` in CMake paths:
+`"~/vendor/..."` is passed literally to CMake by the shell. Use `$HOME` or an
+absolute path instead, for example `"$HOME/vendor/obs-src/libobs"`.
