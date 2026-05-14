@@ -45,6 +45,33 @@ CMake, and the build will search that prefix for the OBS CMake package.
 Install a mingw-w64 toolchain and use the included CMake toolchain file. The
 resulting DLL is a Windows plugin; Linux can build it but cannot run it.
 
+On Ubuntu or Debian, the compiler package is typically installed with:
+
+```sh
+sudo apt-get install g++-mingw-w64-x86-64 binutils-mingw-w64-x86-64
+```
+
+CMake must be able to find `x86_64-w64-mingw32-g++`. That means the directory
+containing that executable must be on `PATH`. For distro packages this is
+usually already `/usr/bin`; verify it with:
+
+```sh
+command -v x86_64-w64-mingw32-g++
+```
+
+If the command prints nothing, add the MinGW `bin` directory to `PATH` before
+configuring. For example, if the compiler is in `/opt/mingw64/bin`:
+
+```sh
+export PATH="/opt/mingw64/bin:$PATH"
+```
+
+Alternatively, pass the directory directly to CMake with
+`-DMINGW_BINDIR=/opt/mingw64/bin`, or pass the compiler explicitly with
+`-DCMAKE_CXX_COMPILER=/opt/mingw64/bin/x86_64-w64-mingw32-g++`.
+
+Then configure and build:
+
 ```sh
 cmake -S . -B build-win \
   -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/windows-mingw.cmake \
