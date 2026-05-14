@@ -1,8 +1,8 @@
 
 #include <ctime>
-#include <obs/obs-data.h>
-#include <obs/obs-module.h>
-#include <obs/obs-properties.h>
+#include <obs-data.h>
+#include <obs-module.h>
+#include <obs-properties.h>
 #include <string>
 #include <time.h>
 
