@@ -1,0 +1,3 @@
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/countdown-source.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/edit_cache.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/rebuild_cache.dir

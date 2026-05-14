@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/Hoopsy/Projects/OBS/Countdown/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
