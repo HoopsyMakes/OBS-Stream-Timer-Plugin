@@ -19,7 +19,8 @@ struct custom_source {
 /* --------------------------------------------------------- */
 
 static const char *custom_source_get_name(void *unused) {
-  return "Custom Browser Wrapper";
+  UNUSED_PARAMETER(unused);
+  return obs_module_text("CustomBrowserWrapper");
 }
 
 /* --------------------------------------------------------- */
@@ -203,7 +204,12 @@ static obs_properties_t *custom_source_properties(void *data) {
     return obs_properties_create();
 
   /* Remove default URL field */
-
+  obs_properties_remove_by_name(props, "is_local_file");
+  obs_properties_remove_by_name(props, "local_file");
+  obs_properties_remove_by_name(props, "fps_custom");
+  obs_properties_remove_by_name(props, "fps");
+  obs_properties_remove_by_name(props, "webpage_control_level");
+  obs_properties_remove_by_name(props, "refreshnocache");
   obs_properties_remove_by_name(props, "url");
   obs_properties_remove_by_name(props, "css");
   obs_properties_remove_by_name(props, "width");
@@ -216,13 +222,13 @@ static obs_properties_t *custom_source_properties(void *data) {
 
   /* Add custom field */
 
-  obs_properties_add_int(props, "width", "Width", 1, 100000, 1);
-  obs_properties_add_int(props, "height", "Height", 1, 100000, 1);
   obs_properties_add_int(props, "hours", "Hours", 0, 999, 1);
   obs_properties_add_int(props, "minutes", "Minutes", 0, 59, 5);
   obs_properties_add_bool(props, "type",
                           "True 24h clock, False means time from now");
   obs_properties_add_text(props, "css", "Custom CSS", OBS_TEXT_MULTILINE);
+  obs_properties_add_int(props, "width", "Width", 1, 100000, 1);
+  obs_properties_add_int(props, "height", "Height", 1, 100000, 1);
 
   return props;
 }
