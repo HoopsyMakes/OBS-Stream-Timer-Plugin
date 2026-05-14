@@ -26,11 +26,11 @@ set(CMAKE_CXX_COMPILER_ARCHITECTURE_ID "x86_64")
 
 
 
-set(CMAKE_AR "/usr/bin/ar")
+set(CMAKE_AR "/usr/bin/x86_64-w64-mingw32-ar")
 set(CMAKE_CXX_COMPILER_AR "/usr/bin/x86_64-w64-mingw32-gcc-ar")
-set(CMAKE_RANLIB "/usr/bin/ranlib")
+set(CMAKE_RANLIB "/usr/bin/x86_64-w64-mingw32-ranlib")
 set(CMAKE_CXX_COMPILER_RANLIB "/usr/bin/x86_64-w64-mingw32-gcc-ranlib")
-set(CMAKE_LINKER "/usr/bin/ld")
+set(CMAKE_LINKER "/usr/bin/x86_64-w64-mingw32-ld")
 set(CMAKE_LINKER_LINK "")
 set(CMAKE_LINKER_LLD "")
 set(CMAKE_CXX_COMPILER_LINKER "NOTFOUND")
@@ -98,5 +98,5 @@ set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")
 set(CMAKE_CXX_COMPILER_CLANG_RESOURCE_DIR "")
 
 set(CMAKE_CXX_COMPILER_IMPORT_STD "")
-set(CMAKE_CXX_COMPILER_IMPORT_STD_ERROR_MESSAGE  "Unsupported generator: Unix Makefiles")
+set(CMAKE_CXX_COMPILER_IMPORT_STD_ERROR_MESSAGE  "Experimental `import std` support not enabled when detecting toolchain; it must be set before `CXX` is enabled (usually a `project()` call)")
 set(CMAKE_CXX_STDLIB_MODULES_JSON "")
