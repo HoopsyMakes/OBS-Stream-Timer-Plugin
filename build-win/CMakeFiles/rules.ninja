@@ -17,7 +17,7 @@
 rule CXX_COMPILER__countdown-source_unscanned_
   depfile = $DEP_FILE
   deps = gcc
-  command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = ${LAUNCHER}${CODE_CHECK}/usr/bin/x86_64-w64-mingw32-g++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -25,9 +25,7 @@ rule CXX_COMPILER__countdown-source_unscanned_
 # Rule for linking CXX shared module.
 
 rule CXX_MODULE_LIBRARY_LINKER__countdown-source_
-  depfile = $DEP_FILE
-  deps = gcc
-  command = $PRE_LINK && /usr/bin/c++ -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /usr/bin/x86_64-w64-mingw32-g++ $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -o $TARGET_FILE -Wl,--major-image-version,0,--minor-image-version,0 $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX shared module $TARGET_FILE
   restat = $RESTAT
 
@@ -44,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/Hoopsy/Projects/OBS/Countdown -B/home/Hoopsy/Projects/OBS/Countdown/build
+  command = /usr/bin/cmake --regenerate-during-build -S/home/Hoopsy/Projects/OBS/Countdown -B/home/Hoopsy/Projects/OBS/Countdown/build-win
   description = Re-running CMake...
   generator = 1
 
