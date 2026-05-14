@@ -14,49 +14,56 @@ add_library(countdown-source MODULE
 
 set_target_properties(countdown-source PROPERTIES PREFIX "")
 
-# Prefer the CMake package installed by OBS Studio. This is the path used by
-# current OBS builds on Windows and is also available on many Linux packages.
-if(DEFINED ENV{OBS_DIR})
-    list(APPEND CMAKE_PREFIX_PATH
-        "$ENV{OBS_DIR}"
-        "$ENV{OBS_DIR}/cmake"
-        "$ENV{OBS_DIR}/cmake/libobs"
-        "$ENV{OBS_DIR}/lib/cmake/libobs"
-        "$ENV{OBS_DIR}/libobs/cmake"
-    )
-endif()
+set(LIBOBS_INCLUDE_DIR "" CACHE PATH "Path to the OBS/libobs include directory")
+set(LIBOBS_LIBRARY "" CACHE FILEPATH "Path to the OBS/libobs library or import library")
+set(LIBOBS_DLL "" CACHE FILEPATH "Optional path to obs.dll when using a Windows import library")
 
-find_package(libobs CONFIG QUIET)
+function(add_manual_libobs_target)
+    if(WIN32 AND LIBOBS_DLL)
+        add_library(OBS::libobs SHARED IMPORTED)
+        set_target_properties(OBS::libobs PROPERTIES
+            IMPORTED_IMPLIB "${LIBOBS_LIBRARY}"
+            IMPORTED_LOCATION "${LIBOBS_DLL}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+        )
+    else()
+        add_library(OBS::libobs UNKNOWN IMPORTED)
+        set_target_properties(OBS::libobs PROPERTIES
+            IMPORTED_LOCATION "${LIBOBS_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+        )
+    endif()
+endfunction()
 
 if(CMAKE_CROSSCOMPILING AND WIN32)
     message(STATUS "Configuring a Windows cross-build; provide Windows OBS headers and a mingw-compatible libobs import library")
 endif()
 
-if(TARGET OBS::libobs)
+if(LIBOBS_INCLUDE_DIR AND LIBOBS_LIBRARY)
+    # Explicit paths are intentionally preferred over any libobs CMake package
+    # found on the host. This is especially important when cross-compiling on
+    # Linux, where a host libobs package may not describe a MinGW import library.
+    add_manual_libobs_target()
     target_link_libraries(countdown-source PRIVATE OBS::libobs)
-elseif(TARGET libobs)
-    target_link_libraries(countdown-source PRIVATE libobs)
 else()
-    set(LIBOBS_INCLUDE_DIR "" CACHE PATH "Path to the OBS/libobs include directory")
-    set(LIBOBS_LIBRARY "" CACHE FILEPATH "Path to the OBS/libobs library or import library")
-    set(LIBOBS_DLL "" CACHE FILEPATH "Optional path to obs.dll when using a Windows import library")
+    # Prefer the CMake package installed by OBS Studio. This is the path used by
+    # current OBS builds on Windows and is also available on many Linux packages.
+    if(DEFINED ENV{OBS_DIR})
+        list(APPEND CMAKE_PREFIX_PATH
+            "$ENV{OBS_DIR}"
+            "$ENV{OBS_DIR}/cmake"
+            "$ENV{OBS_DIR}/cmake/libobs"
+            "$ENV{OBS_DIR}/lib/cmake/libobs"
+            "$ENV{OBS_DIR}/libobs/cmake"
+        )
+    endif()
 
-    if(LIBOBS_INCLUDE_DIR AND LIBOBS_LIBRARY)
-        if(WIN32 AND LIBOBS_DLL)
-            add_library(OBS::libobs SHARED IMPORTED)
-            set_target_properties(OBS::libobs PROPERTIES
-                IMPORTED_IMPLIB "${LIBOBS_LIBRARY}"
-                IMPORTED_LOCATION "${LIBOBS_DLL}"
-                INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
-            )
-        else()
-            add_library(OBS::libobs UNKNOWN IMPORTED)
-            set_target_properties(OBS::libobs PROPERTIES
-                IMPORTED_LOCATION "${LIBOBS_LIBRARY}"
-                INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
-            )
-        endif()
+    find_package(libobs CONFIG QUIET)
+
+    if(TARGET OBS::libobs)
         target_link_libraries(countdown-source PRIVATE OBS::libobs)
+    elseif(TARGET libobs)
+        target_link_libraries(countdown-source PRIVATE libobs)
     elseif(NOT WIN32)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(LIBOBS REQUIRED IMPORTED_TARGET libobs)

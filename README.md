@@ -114,3 +114,24 @@ Do not keep building a directory after CMake reports a configure error. Clean th
 build directory and configure again. Also avoid quoting `~` in CMake paths:
 `"~/vendor/..."` is passed literally to CMake by the shell. Use `$HOME` or an
 absolute path instead, for example `"$HOME/vendor/obs-src/libobs"`.
+
+### `IMPORTED_IMPLIB not set for imported target "OBS::libobs"`
+
+This happens when CMake finds a `libobs` package target that does not describe a
+MinGW import library for the Windows cross-build. Pass both manual paths and this
+project will prefer them over the discovered package:
+
+```sh
+rm -rf build-win
+
+cmake -S . -B build-win \
+  -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/windows-mingw.cmake \
+  -DLIBOBS_INCLUDE_DIR="$HOME/vendor/obs-src/libobs" \
+  -DLIBOBS_LIBRARY="$HOME/vendor/obs-mingw-lib/libobs.dll.a" \
+  -DLIBOBS_DLL="$OBS_DLL"
+```
+
+If you still see `Manually-specified variables were not used by the project`, you
+are configuring an older checkout or an old cached build directory. Pull the
+latest changes and remove `build-win` before configuring again.
