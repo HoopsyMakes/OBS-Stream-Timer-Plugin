@@ -1,3 +1,7 @@
 /home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/countdown-source.dir
 /home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/edit_cache.dir
 /home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/rebuild_cache.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/list_install_components.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/install.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/install/local.dir
+/home/Hoopsy/Projects/OBS/Countdown/build/CMakeFiles/install/strip.dir
