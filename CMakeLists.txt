@@ -28,20 +28,34 @@ endif()
 
 find_package(libobs CONFIG QUIET)
 
+if(CMAKE_CROSSCOMPILING AND WIN32)
+    message(STATUS "Configuring a Windows cross-build; provide Windows OBS headers and a mingw-compatible libobs import library")
+endif()
+
 if(TARGET OBS::libobs)
     target_link_libraries(countdown-source PRIVATE OBS::libobs)
 elseif(TARGET libobs)
     target_link_libraries(countdown-source PRIVATE libobs)
 else()
     set(LIBOBS_INCLUDE_DIR "" CACHE PATH "Path to the OBS/libobs include directory")
-    set(LIBOBS_LIBRARY "" CACHE FILEPATH "Path to the OBS/libobs library")
+    set(LIBOBS_LIBRARY "" CACHE FILEPATH "Path to the OBS/libobs library or import library")
+    set(LIBOBS_DLL "" CACHE FILEPATH "Optional path to obs.dll when using a Windows import library")
 
     if(LIBOBS_INCLUDE_DIR AND LIBOBS_LIBRARY)
-        add_library(OBS::libobs UNKNOWN IMPORTED)
-        set_target_properties(OBS::libobs PROPERTIES
-            IMPORTED_LOCATION "${LIBOBS_LIBRARY}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
-        )
+        if(WIN32 AND LIBOBS_DLL)
+            add_library(OBS::libobs SHARED IMPORTED)
+            set_target_properties(OBS::libobs PROPERTIES
+                IMPORTED_IMPLIB "${LIBOBS_LIBRARY}"
+                IMPORTED_LOCATION "${LIBOBS_DLL}"
+                INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+            )
+        else()
+            add_library(OBS::libobs UNKNOWN IMPORTED)
+            set_target_properties(OBS::libobs PROPERTIES
+                IMPORTED_LOCATION "${LIBOBS_LIBRARY}"
+                INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+            )
+        endif()
         target_link_libraries(countdown-source PRIVATE OBS::libobs)
     elseif(NOT WIN32)
         find_package(PkgConfig REQUIRED)
@@ -51,7 +65,8 @@ else()
         message(FATAL_ERROR
             "Unable to find libobs. Set OBS_DIR to your OBS install or build prefix, "
             "or pass -Dlibobs_DIR=/path/to/libobs/cmake, or pass both "
-            "-DLIBOBS_INCLUDE_DIR=... and -DLIBOBS_LIBRARY=..."
+            "-DLIBOBS_INCLUDE_DIR=... and -DLIBOBS_LIBRARY=... "
+            "(use a mingw-compatible import library such as libobs.dll.a when cross-building)."
         )
     endif()
 endif()
