@@ -19,18 +19,35 @@ set(LIBOBS_LIBRARY "" CACHE FILEPATH "Path to the OBS/libobs library or import l
 set(LIBOBS_DLL "" CACHE FILEPATH "Optional path to obs.dll when using a Windows import library")
 
 function(add_manual_libobs_target)
+    set(_libobs_include_dirs "${LIBOBS_INCLUDE_DIR}")
+
+    if(NOT EXISTS "${LIBOBS_INCLUDE_DIR}/obsconfig.h")
+        set(_generated_libobs_config_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/libobs")
+        file(MAKE_DIRECTORY "${_generated_libobs_config_dir}")
+        file(WRITE "${_generated_libobs_config_dir}/obsconfig.h" [=[#pragma once
+#define OBS_VERSION "external"
+#define OBS_DATA_PATH "../../data"
+#define OBS_INSTALL_PREFIX ""
+#define OBS_PLUGIN_DESTINATION "obs-plugins"
+#define OBS_RELATIVE_PREFIX "../../"
+#define OBS_RELEASE_CANDIDATE 0
+#define OBS_BETA 0
+]=])
+        list(APPEND _libobs_include_dirs "${_generated_libobs_config_dir}")
+    endif()
+
     if(WIN32 AND LIBOBS_DLL)
         add_library(OBS::libobs SHARED IMPORTED)
         set_target_properties(OBS::libobs PROPERTIES
             IMPORTED_IMPLIB "${LIBOBS_LIBRARY}"
             IMPORTED_LOCATION "${LIBOBS_DLL}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+            INTERFACE_INCLUDE_DIRECTORIES "${_libobs_include_dirs}"
         )
     else()
         add_library(OBS::libobs UNKNOWN IMPORTED)
         set_target_properties(OBS::libobs PROPERTIES
             IMPORTED_LOCATION "${LIBOBS_LIBRARY}"
-            INTERFACE_INCLUDE_DIRECTORIES "${LIBOBS_INCLUDE_DIR}"
+            INTERFACE_INCLUDE_DIRECTORIES "${_libobs_include_dirs}"
         )
     endif()
 endfunction()
